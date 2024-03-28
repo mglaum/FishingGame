@@ -1,6 +1,6 @@
 # Fishing Simulator Game
 
-Team Members: Savannah Fletcher & Madeleine Glaum
+Team Members: [Savannah Fletcher](https://github.com/savannahfletcher) & [Madeleine Glaum](https://github.com/mglaum)
 
 ## Gameplay
 
