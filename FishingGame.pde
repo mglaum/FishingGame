@@ -1,12 +1,5 @@
 PImage mainMenuBackground;
 
-class Game {
-  static enum State {MENU, PROLOGUE, FISHING, MARKET}; 
-  State state; 
-  Game(State s) {
-    state = s; 
-  }
-}
 class Fish {
   int value; 
   String name; 
