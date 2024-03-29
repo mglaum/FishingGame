@@ -1,5 +1,5 @@
 // Array of all fish in the game
-Fish[] fish = new Fish[2]; // Update size as fish are added
+Fish[] fish = new Fish[3]; // Update size as fish are added
 
 PFont titleFont;
 PFont casualFont;
@@ -67,6 +67,7 @@ int x5 = 20;
 int x6 = 520;
 int fish1 = 100;
 int fish2 = 500;
+int fish3 = 300;
 
 void drawMainMenu() {
   // drawing images: background, clouds, fish, buttons
@@ -82,6 +83,7 @@ void drawMainMenu() {
   // TODO: use random int to select a fish from the fish array
   image(fish[0].sprite, fish1++, 500);
   image(fish[1].sprite, fish2++, 180);
+  image(fish[2].sprite, fish3++, 300);
   
   imageMode(CENTER);
   image(plankButton, 300, 275);
@@ -142,4 +144,6 @@ void checkBounds() {
     fish1 = -64;
   if (fish2 > 600)
     fish2 = -64;
+  if (fish3 > 600)
+    fish3 = -64;
 }
