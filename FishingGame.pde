@@ -1,3 +1,4 @@
+// Array of all fish in the game
 Fish[] fish = new Fish[2]; // Update size as fish are added
 
 PFont titleFont;
@@ -57,6 +58,7 @@ void draw() {
     drawMainMenu(); 
 }
 
+// Variables for moving x-coords of clouds and fish
 int x1 = 50;
 int x2 = 175;
 int x3 = 350;
