@@ -1,3 +1,5 @@
+import processing.sound.*;
+SoundFile click;
 // Array of all fish in the game
 Fish[] fish = new Fish[3]; // Update size as fish are added
 
@@ -11,6 +13,8 @@ PImage cloud3;
 PImage cloud4;
 PImage cloud5;
 PImage cloud6;
+boolean start = true; 
+boolean difficulty = false; 
 
 class Fish {
   int value; 
@@ -52,10 +56,13 @@ void setup() {
     plankButton.resize(300, 0);
     loadClouds();
     loadFish();
+     click = new SoundFile(this, "./audio/button_sound.mov");
 }
 
 void draw() {
     drawMainMenu(); 
+    //println(mouseX); //160 430
+    println(mouseY); //242 314
 }
 
 // Variables for moving x-coords of clouds and fish
@@ -93,12 +100,36 @@ void drawMainMenu() {
     
   // writing all text to the main menu screen
   textAlign(CENTER);
+
   fill(#044d57);
   textFont(titleFont);
   text("Fishing Game", 300, 105);
   textFont(casualFont);
-  text("Start", 300, 285);
-  text("Quit", 300, 410);
+    if (mouseX > 160 && mouseX < 430 && mouseY > 242 && mouseY < 314) {
+    fill(255); 
+  }
+  else {
+    fill(#044d57);
+  }
+  if (start) {
+    text("Start", 300, 285);
+  }
+  else {
+    text("Normal", 300, 285);
+  }
+  
+      if (mouseX > 160 && mouseX < 430 && mouseY > 370 && mouseY < 430) {
+    fill(255); 
+  }
+  else {
+    fill(#044d57);
+  }
+  if (start) {
+    text("Quit", 300, 410);
+  }
+  else {
+    text("Hard", 300, 410);
+  }
 
 }
 
@@ -146,4 +177,19 @@ void checkBounds() {
     fish2 = -64;
   if (fish3 > 600)
     fish3 = -64;
+}
+
+void mousePressed() {
+  //IF IN THE MAIN MENU
+   if (mouseX > 160 && mouseX < 430 && mouseY > 370 && mouseY < 430) {
+     click.play(); 
+     exit(); 
+   }
+   if (mouseX > 160 && mouseX < 430 && mouseY > 242 && mouseY < 314) {
+     click.play(); 
+     if (start) {
+       start = false; 
+       difficulty = true; 
+     }
+   }
 }
