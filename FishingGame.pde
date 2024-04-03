@@ -14,8 +14,7 @@ PImage cloud3;
 PImage cloud4;
 PImage cloud5;
 PImage cloud6;
-boolean start = true; 
-boolean difficulty = false; 
+PImage fishingBackground;
 
 // Class to handle game statesa
 class Game {
@@ -72,6 +71,8 @@ void setup() {
     titleFont = createFont("./fonts/PIXEL-LI.TTF", 100);
     casualFont = createFont("./fonts/dogicabold.otf", 35);
     mainMenuBackground = loadImage("./images/MainMenuBackground.png");
+    fishingBackground = loadImage("./images/FishingBackground.png");
+    fishingBackground.resize(600, 0);
     plankButton = loadImage("./images/button.PNG");
     plankButton.resize(300, 0);
     loadClouds();
@@ -80,7 +81,17 @@ void setup() {
 }
 
 void draw() {
+  if (game.isMainMenu1 || game.isMainMenu2) {
     drawMainMenu(); 
+  } else if (game.isPrologue) {
+
+  } else if (game.isFishing) {
+    drawFishing();
+  } else if (game.isShopping) {
+
+  } else if (game.isVictorious) {
+
+  }
 }
 
 // Variables for moving x-coords of clouds and fish
@@ -96,7 +107,6 @@ int fish3 = 300;
 
 void drawMainMenu() {
   // drawing images: background, clouds, fish, buttons
-  imageMode(CORNER);
   image(mainMenuBackground, 0, 0);
   image(cloud1, x1--, 75);
   image(cloud2, x2--, 10);
@@ -148,7 +158,7 @@ void drawMainMenu() {
   else {
     text("Hard", 300, 410);
   }
-
+  imageMode(CORNER);
 }
 
 void loadClouds() {
@@ -218,8 +228,12 @@ void mousePressed() {
      } else if (game.isMainMenu2) {
       game.difficulty = 1;
       game.isMainMenu2 = false;
-      game.isPrologue = true;
+      game.isFishing = true; //TODO: should progress to prologue next instead
      }
    
   }
+}
+
+void drawFishing() {
+  image(fishingBackground, 0, 0);
 }
