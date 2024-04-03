@@ -2,6 +2,7 @@ import processing.sound.*;
 SoundFile click;
 // Array of all fish in the game
 Fish[] fish = new Fish[3]; // Update size as fish are added
+Game game = new Game();
 
 PFont titleFont;
 PFont casualFont;
@@ -15,6 +16,25 @@ PImage cloud5;
 PImage cloud6;
 boolean start = true; 
 boolean difficulty = false; 
+
+// Class to handle game statesa
+class Game {
+  int difficulty; // 1 = Normal, 2 = Hard
+  boolean isMainMenu1; // game state 1: start or quit
+  boolean isMainMenu2; // game state 2: select difficulty
+  boolean isPrologue; // game state 3: prologue
+  boolean isFishing; // game state 4: fishing
+  boolean isShopping; // game state 5: shopping in market
+  boolean isVictorious; // game state 6: end credits
+  Game() {
+    isMainMenu1 = true;
+    isMainMenu2 = false;
+    isPrologue = false;
+    isFishing = false;
+    isShopping = false;
+    isVictorious = false;
+  }
+}
 
 class Fish {
   int value; 
@@ -61,8 +81,6 @@ void setup() {
 
 void draw() {
     drawMainMenu(); 
-    //println(mouseX); //160 430
-    println(mouseY); //242 314
 }
 
 // Variables for moving x-coords of clouds and fish
@@ -111,7 +129,7 @@ void drawMainMenu() {
   else {
     fill(#044d57);
   }
-  if (start) {
+  if (game.isMainMenu1) {
     text("Start", 300, 285);
   }
   else {
@@ -124,7 +142,7 @@ void drawMainMenu() {
   else {
     fill(#044d57);
   }
-  if (start) {
+  if (game.isMainMenu1) {
     text("Quit", 300, 410);
   }
   else {
@@ -180,16 +198,28 @@ void checkBounds() {
 }
 
 void mousePressed() {
-  //IF IN THE MAIN MENU
-   if (mouseX > 160 && mouseX < 430 && mouseY > 370 && mouseY < 430) {
-     click.play(); 
-     exit(); 
+  // lower button: main menu 1 -> quit, main menu 2 -> hard difficulty
+  if (mouseX > 160 && mouseX < 430 && mouseY > 370 && mouseY < 430) {
+    click.play(); 
+    if (game.isMainMenu1) {
+      exit(); 
+    } else if (game.isMainMenu2) {
+      game.difficulty = 2;
+      game.isMainMenu2 = false;
+      game.isPrologue = true;
+    }
    }
+   // upper button: main menu 1 -> start, main menu 2 -> normal difficulty
    if (mouseX > 160 && mouseX < 430 && mouseY > 242 && mouseY < 314) {
      click.play(); 
-     if (start) {
-       start = false; 
-       difficulty = true; 
+     if (game.isMainMenu1) {
+       game.isMainMenu1 = false;
+       game.isMainMenu2 = true;
+     } else if (game.isMainMenu2) {
+      game.difficulty = 1;
+      game.isMainMenu2 = false;
+      game.isPrologue = true;
      }
-   }
+   
+  }
 }
