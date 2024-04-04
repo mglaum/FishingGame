@@ -81,9 +81,12 @@ void setup() {
 }
 
 void draw() {
+  println("x: " + mouseX); 
+  println("y: " + mouseY); 
   if (game.isMainMenu1 || game.isMainMenu2) {
     drawMainMenu(); 
   } else if (game.isPrologue) {
+    drawPrologue(); 
 
   } else if (game.isFishing) {
     drawFishing();
@@ -209,31 +212,50 @@ void checkBounds() {
 
 void mousePressed() {
   // lower button: main menu 1 -> quit, main menu 2 -> hard difficulty
-  if (mouseX > 160 && mouseX < 430 && mouseY > 370 && mouseY < 430) {
-    click.play(); 
-    if (game.isMainMenu1) {
-      exit(); 
-    } else if (game.isMainMenu2) {
-      game.difficulty = 2;
-      game.isMainMenu2 = false;
-      game.isPrologue = true;
-    }
-   }
-   // upper button: main menu 1 -> start, main menu 2 -> normal difficulty
-   if (mouseX > 160 && mouseX < 430 && mouseY > 242 && mouseY < 314) {
-     click.play(); 
-     if (game.isMainMenu1) {
-       game.isMainMenu1 = false;
-       game.isMainMenu2 = true;
-     } else if (game.isMainMenu2) {
-      game.difficulty = 1;
-      game.isMainMenu2 = false;
-      game.isFishing = true; //TODO: should progress to prologue next instead
+  if (game.isMainMenu1 || game.isMainMenu2) {
+    if (mouseX > 160 && mouseX < 430 && mouseY > 370 && mouseY < 430) {
+      click.play(); 
+      if (game.isMainMenu1) {
+        exit(); 
+      } else if (game.isMainMenu2) {
+        game.difficulty = 2;
+        game.isMainMenu2 = false;
+        game.isPrologue = true;
+      }
      }
-   
+     // upper button: main menu 1 -> start, main menu 2 -> normal difficulty
+     if (mouseX > 160 && mouseX < 430 && mouseY > 242 && mouseY < 314) {
+       click.play(); 
+       if (game.isMainMenu1) {
+         game.isMainMenu1 = false;
+         game.isMainMenu2 = true;
+       } else if (game.isMainMenu2) {
+        game.difficulty = 1;
+        game.isMainMenu2 = false;
+        game.isPrologue = true; 
+       }
+     }
+  }
+  if (game.isPrologue) {
+    if (mouseX > 510 && mouseX < 587 && mouseY > 32 && mouseY < 52) {
+      game.isPrologue = false; 
+      game.isFishing = true; 
+    }
   }
 }
 
 void drawFishing() {
   image(fishingBackground, 0, 0);
+}
+
+void drawPrologue() {
+  background(255); 
+  text("Prologue here", width/2, height/2);
+  imageMode(CORNER); 
+  //image(plankButton, 400, 10);
+  textSize(20); 
+  
+  text("skip", width - 50, 50); 
+  
+  
 }
