@@ -3,6 +3,7 @@ SoundFile click;
 // Array of all fish in the game
 Fish[] fish = new Fish[3]; // Update size as fish are added
 Game game = new Game();
+Player player = new Player(); 
 
 PFont titleFont;
 PFont casualFont;
@@ -45,6 +46,16 @@ class Fish {
     name = n; 
     sprite = img; 
     rarity = r; 
+  }
+}
+class Player {
+  boolean cast; 
+  int x; 
+  int y; 
+  Player() {
+    cast = false; 
+    x = 0; 
+    y = 0; 
   }
 }
 
@@ -242,10 +253,21 @@ void mousePressed() {
       game.isFishing = true; 
     }
   }
+  if (game.isFishing) {
+    if (player.cast) {
+      startCastAnimation(); 
+      player.cast = false; 
+    }
+    else {
+      player.cast = true; 
+    }
+    updatePlayer(); 
+  }
 }
 
 void drawFishing() {
   image(fishingBackground, 0, 0);
+  updatePlayer(); 
 }
 
 void drawPrologue() {
@@ -256,6 +278,36 @@ void drawPrologue() {
   textSize(20); 
   
   text("skip", width - 50, 50); 
-  
-  
+}
+
+// Declare variables to keep track of time
+int castStartTime = 0;
+int castDuration = 1000; // 1 second in milliseconds
+
+void updatePlayer() {
+  PImage cast = loadImage("images/Cast.PNG"); 
+  PImage idle = loadImage("images/fishing1.PNG"); 
+  PImage rest = loadImage("images/resting.PNG"); 
+  cast.resize(600, 0);
+  rest.resize(600, 0);
+  idle.resize(600, 0); 
+
+  if (player.cast) {
+    // Check if the cast animation has just started
+    if (millis() - castStartTime < castDuration) {
+      image(cast, player.x, player.y); 
+    } else {
+      // If more than 1 second has passed, switch to idle animation
+      image(idle, player.x, player.y);
+    }
+  }
+  else {
+    image(rest, player.x, player.y); 
+  }
+}
+
+// Call this function when starting the cast animation
+void startCastAnimation() {
+  castStartTime = millis(); 
+  player.cast = true; // Assuming player.cast is a boolean variable indicating if the player is casting
 }
