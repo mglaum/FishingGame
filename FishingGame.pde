@@ -1,7 +1,7 @@
 import processing.sound.*;
 SoundFile click;
 // Array of all fish in the game
-Fish[] fish = new Fish[3]; // Update size as fish are added
+Fish[] fish = new Fish[6]; // Update size as fish are added
 Game game = new Game();
 Player player = new Player(); 
 
