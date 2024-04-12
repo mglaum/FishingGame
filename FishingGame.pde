@@ -45,11 +45,11 @@ class Fish {
     value = val; 
     name = n; 
     sprite = img; 
-    rarity = r; 
+    rarity = r; // i.e. Most common: 20, Least common: 1
   }
 }
 class Player {
-  boolean cast; 
+  boolean cast; // True if casting or line is in the water; false if resting/reeled in
   int x; 
   int y; 
   Player() {
@@ -88,7 +88,10 @@ void setup() {
     plankButton.resize(300, 0);
     loadClouds();
     loadFish();
-     click = new SoundFile(this, "./audio/button_sound.mov");
+    click = new SoundFile(this, "./audio/button_sound.mov");
+    //TODO: remove after testing
+    // game.isFishing = true;
+    // game.isMainMenu1 = false;
 }
 
 void draw() {
@@ -98,7 +101,6 @@ void draw() {
     drawMainMenu(); 
   } else if (game.isPrologue) {
     drawPrologue(); 
-
   } else if (game.isFishing) {
     drawFishing();
   } else if (game.isShopping) {
@@ -129,7 +131,6 @@ void drawMainMenu() {
   image(cloud5, x5--, 25);
   image(cloud6, x6--, 95);
   
-  // TODO: use random int to select a fish from the fish array
   image(fish[0].sprite, fish1++, 500);
   image(fish[1].sprite, fish2++, 180);
   image(fish[2].sprite, fish3++, 300);
@@ -160,7 +161,7 @@ void drawMainMenu() {
     text("Normal", 300, 285);
   }
   
-      if (mouseX > 160 && mouseX < 430 && mouseY > 370 && mouseY < 430) {
+  if (mouseX > 160 && mouseX < 430 && mouseY > 370 && mouseY < 430) {
     fill(255); 
   }
   else {
@@ -191,12 +192,36 @@ void loadClouds() {
 }
 
 void loadFish() {
-  for (int i = 1; i <= fish.length; i++) {
-    String name = "./images/fish/" + str(i) + ".PNG";
-    PImage fishImage = loadImage(name);
-    fishImage.resize(64, 0);
-    fish[i-1] = new Fish(3, "Temp Name", fishImage, 0.10);
-  }
+  // Fish 1: Clownfish
+  PImage fishImage = loadImage("./images/fish/1.PNG");
+  fishImage.resize(64, 0);
+  fish[0] = new Fish(5, "Clownfish", fishImage, 15);
+
+  // Fish 2: Salmon
+  fishImage = loadImage("./images/fish/2.PNG");
+  fishImage.resize(64, 0);
+  fish[1] = new Fish(10, "Salmon", fishImage, 5);
+
+  // Fish 3: Blue tang
+  fishImage = loadImage("./images/fish/3.PNG");
+  fishImage.resize(64, 0);
+  fish[2] = new Fish(5, "Blue tang", fishImage, 10);
+
+  // Fish 4: Eel
+  fishImage = loadImage("./images/fish/4.PNG");
+  fishImage.resize(64, 0);
+  fish[3] = new Fish(10, "Eel", fishImage, 5);
+
+  // Fish 5: Catfish
+  fishImage = loadImage("./images/fish/5.PNG");
+  fishImage.resize(64, 0);
+  fish[4] = new Fish(8, "Catfish", fishImage, 10);
+
+  // Fish 6: Shrimp
+  fishImage = loadImage("./images/fish/6.PNG");
+  fishImage.resize(64, 0);
+  fish[5] = new Fish(3, "Shrimp", fishImage, 10);
+
 }
 
 void checkBounds() {
@@ -246,22 +271,27 @@ void mousePressed() {
         game.isPrologue = true; 
        }
      }
+     return;
   }
   if (game.isPrologue) {
     if (mouseX > 510 && mouseX < 587 && mouseY > 32 && mouseY < 52) {
       game.isPrologue = false; 
       game.isFishing = true; 
     }
+    return;
   }
   if (game.isFishing) {
-    if (player.cast) {
+    if (player.cast == false) {
       startCastAnimation(); 
-      player.cast = false; 
-    }
-    else {
       player.cast = true; 
     }
+    else {
+      player.cast = false; 
+      // Trigger mini game to catch the fish:
+
+    }
     updatePlayer(); 
+    return;
   }
 }
 
@@ -282,15 +312,19 @@ void drawPrologue() {
 
 // Declare variables to keep track of time
 int castStartTime = 0;
-int castDuration = 1000; // 1 second in milliseconds
+int castDuration = 800; // 800 milliseconds
+int waterDriftDuration;
+boolean driftBool = true;
 
 void updatePlayer() {
   PImage cast = loadImage("images/Cast.PNG"); 
   PImage idle = loadImage("images/fishing1.PNG"); 
+  PImage idle2 = loadImage("images/fishing2.PNG");
   PImage rest = loadImage("images/resting.PNG"); 
   cast.resize(600, 0);
   rest.resize(600, 0);
   idle.resize(600, 0); 
+  idle2.resize(600, 0); 
 
   if (player.cast) {
     // Check if the cast animation has just started
@@ -298,7 +332,15 @@ void updatePlayer() {
       image(cast, player.x, player.y); 
     } else {
       // If more than 1 second has passed, switch to idle animation
-      image(idle, player.x, player.y);
+      if (millis() > waterDriftDuration) {
+        driftBool = !driftBool;
+        waterDriftDuration = millis() + 1000;
+      }
+      if (driftBool) {
+        image(idle, player.x, player.y);
+      } else {
+        image(idle2, player.x, player.y);
+      }
     }
   }
   else {
@@ -309,5 +351,4 @@ void updatePlayer() {
 // Call this function when starting the cast animation
 void startCastAnimation() {
   castStartTime = millis(); 
-  player.cast = true; // Assuming player.cast is a boolean variable indicating if the player is casting
 }
