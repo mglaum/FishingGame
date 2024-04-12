@@ -2,7 +2,6 @@ import processing.sound.*;
 SoundFile click;
 // Array of all fish in the game
 Fish[] fish = new Fish[6]; // Update size as fish are added
-ArrayList<Fish> fishInTheSea = new ArrayList<Fish>(); // array for random generation of fish
 Game game = new Game();
 Player player = new Player(); 
 
@@ -19,9 +18,8 @@ PImage cloud6;
 PImage fishingBackground;
 PImage miniGameBackground;
 PImage miniGameBall;
-PImage backgroundForDisplay;
 
-// Class to handle game states
+// Class to handle game statesa
 class Game {
   int difficulty; // 1 = Normal, 2 = Hard
   boolean isMainMenu1; // game state 1: start or quit
@@ -56,14 +54,10 @@ class Fish {
 }
 class Player {
   boolean cast; // True if casting or line is in the water; false if resting/reeled in
-  boolean nibble; 
-  boolean caught;
   int x; 
   int y; 
-  ArrayList<Fish> inventory = new ArrayList<Fish>(); // dynamic array
   Player() {
     cast = false; 
-    caught = false;
     x = 0; 
     y = 0; 
   }
@@ -100,32 +94,23 @@ void setup() {
     miniGameBackground.resize(300, 0);
     miniGameBall = loadImage("./images/miniGameBall.png");
     miniGameBall.resize(16, 0);
-    backgroundForDisplay = loadImage("./images/backgroundForDisplay.png");
-    backgroundForDisplay.resize(300, 0);
     loadClouds();
     loadFish();
     click = new SoundFile(this, "./audio/button_sound.mov");
     //TODO: remove after testing
-    //  game.isFishing = true;
-    //  game.isMainMenu1 = false;
+     game.isFishing = true;
+     game.isMainMenu1 = false;
 }
 
-
-
 void draw() {
+  println("x: " + mouseX); 
+  println("y: " + mouseY); 
   if (game.isMainMenu1 || game.isMainMenu2) {
     drawMainMenu(); 
   } else if (game.isPrologue) {
     drawPrologue(); 
   } else if (game.isFishing) {
     drawFishing();
-  } else if (game.isMiniGame) {
-    drawMiniGame();
-    if (player.caught) {
-      displayFish();
-    } else {
-
-    }
   } else if (game.isShopping) {
 
   } else if (game.isVictorious) {
@@ -245,12 +230,6 @@ void loadFish() {
   fishImage.resize(64, 0);
   fish[5] = new Fish(3, "Shrimp", fishImage, 10);
 
-  // for each fish in fish array, add r fish (r=rarity count) to fishInTheSea
-  for (int i = 0; i < fish.length; i++) {
-    for (int j = 0; j < fish[i].rarity; j++) {
-      fishInTheSea.add(fish[i]);
-    }
-  }
 }
 
 void checkBounds() {
@@ -276,7 +255,6 @@ void checkBounds() {
 }
 
 void mousePressed() {
-  print("X: " + mouseX + ", Y: " + mouseY);
   // lower button: main menu 1 -> quit, main menu 2 -> hard difficulty
   if (game.isMainMenu1 || game.isMainMenu2) {
     if (mouseX > 160 && mouseX < 430 && mouseY > 370 && mouseY < 430) {
@@ -319,31 +297,17 @@ void mousePressed() {
       player.cast = false; 
       // Trigger mini game to catch the fish:
       game.isMiniGame = true;
-      game.isFishing = false;
 
     }
     updatePlayer(); 
     return;
   }
   if (game.isMiniGame) {
-    if (player.caught == true) {
-      // If player selects continue after catching a fish
-      if (mouseX >= 219 && mouseY >= 379 && mouseX <= 379 && mouseY <= 419) {
-        game.isMiniGame = false;
-        player.caught = false; 
-      }
-
-    }
     if (ballX >= 250 && ballY >= 270 && ballX <= 350 && ballY <= 330) {
-      print("Success");
-      generateFish();
-      player.caught = true;
-      displayFish();
-    } else {
-      print("Failed");
-      game.isMiniGame = false;
-      game.isFishing = true;
-    }
+    print("Success");
+  } else {
+    print("Failed");
+  }
   }
 }
 
@@ -356,7 +320,9 @@ void drawPrologue() {
   background(255); 
   text("Prologue here", width/2, height/2);
   imageMode(CORNER); 
+  //image(plankButton, 400, 10);
   textSize(20); 
+  
   text("skip", width - 50, 50); 
 }
 
@@ -365,49 +331,34 @@ int castStartTime = 0;
 int castDuration = 800; // 800 milliseconds
 int waterDriftDuration;
 boolean driftBool = true;
-int bite = castStartTime + (int)random(2000, 10000);
 
 void updatePlayer() {
   PImage cast = loadImage("images/Cast.PNG"); 
   PImage idle = loadImage("images/fishing1.PNG"); 
   PImage idle2 = loadImage("images/fishing2.PNG");
   PImage rest = loadImage("images/resting.PNG"); 
-  PImage nibble = loadImage("images/nibble.PNG"); 
   cast.resize(600, 0);
   rest.resize(600, 0);
   idle.resize(600, 0); 
   idle2.resize(600, 0); 
-  nibble.resize(600, 0); 
 
   if (player.cast) {
-    
     // Check if the cast animation has just started
     if (millis() - castStartTime < castDuration) {
       image(cast, player.x, player.y); 
     } else {
       // If more than 1 second has passed, switch to idle animation
-      // Nibble can occur randomly now
-       
-      println("bite: " + bite); 
-      if (millis() == bite || ((millis() > bite) && (millis() < bite+1000))) {
-        player.nibble = true; 
-        image(nibble, player.x, player.y); 
+      if (millis() > waterDriftDuration) {
+        driftBool = !driftBool;
+        waterDriftDuration = millis() + 1000;
       }
-      else {
-        player.nibble = false; 
-        if (millis() > waterDriftDuration) {
-          driftBool = !driftBool;
-          waterDriftDuration = millis() + 1000;
-        }
-        if (driftBool) {
-          image(idle, player.x, player.y);
-        } else {
-          image(idle2, player.x, player.y);
-        }
+      if (driftBool) {
+        image(idle, player.x, player.y);
+      } else {
+        image(idle2, player.x, player.y);
       }
     }
   }
-  
   else {
     image(rest, player.x, player.y); 
   }
@@ -415,10 +366,9 @@ void updatePlayer() {
 
 // Call this function when starting the cast animation
 void startCastAnimation() {
-  castStartTime = millis();
-  bite = castStartTime + (int)random(2000, 10000);
-  
+  castStartTime = millis(); 
 }
+
 
 int ballX = (int)random(150, 435);
 int ballY = (int)random(150, 435);
@@ -426,6 +376,7 @@ boolean NE, NW, SW = false; // Directions: Northeast, Northwest, etc.
 boolean SE = true;
 
 void drawMiniGame() {
+  // image(fishingBackground, 0, 0);
   image(miniGameBackground, 150, 150);
   image(miniGameBall, ballX, ballY);
 
@@ -470,39 +421,4 @@ void drawMiniGame() {
       NW = true;
     }
   }
-}
-
-PImage currCatch;
-String currName;
-// Only generate the fish once
-void generateFish() {
-  int fishNum = (int)random(0, fishInTheSea.size());
-  Fish caughtFish = fishInTheSea.get(fishNum);
-  PImage img = caughtFish.sprite;
-  img.resize(128, 128);
-  currCatch = img;
-  currName = caughtFish.name;
-  print("Caught: " + caughtFish.name);
-  player.inventory.add(caughtFish);
-}
-
-// Generate and display random fish, add to the inventory
-void displayFish() {
-  image(backgroundForDisplay, 150, 150);
-
-  imageMode(CENTER);
-  image(currCatch, 300, 300);
-  PImage button = plankButton;
-  button.resize(175, 0);
-  image(plankButton, 300, 400);
-
-  fill(#044d57);
-  textFont(casualFont);
-  textSize(10);
-  textAlign(CENTER);
-  text("You caught a " + currName + "!", 300, 250);
-  textSize(14);
-  text("Continue", 300, 405);
-  imageMode(CORNER);
-
 }
