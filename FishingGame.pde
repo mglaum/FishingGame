@@ -50,6 +50,7 @@ class Fish {
 }
 class Player {
   boolean cast; // True if casting or line is in the water; false if resting/reeled in
+  boolean nibble; 
   int x; 
   int y; 
   Player() {
@@ -95,8 +96,6 @@ void setup() {
 }
 
 void draw() {
-  println("x: " + mouseX); 
-  println("y: " + mouseY); 
   if (game.isMainMenu1 || game.isMainMenu2) {
     drawMainMenu(); 
   } else if (game.isPrologue) {
@@ -287,6 +286,8 @@ void mousePressed() {
     }
     else {
       player.cast = false; 
+      // check if nibble 
+      
       // Trigger mini game to catch the fish:
 
     }
@@ -315,34 +316,55 @@ int castStartTime = 0;
 int castDuration = 800; // 800 milliseconds
 int waterDriftDuration;
 boolean driftBool = true;
+int bite = castStartTime + (int)random(2000, 10000);
 
 void updatePlayer() {
+  println("Cast start time:" + castStartTime); 
+  //println("CastDuration: " + castDuration); 
+  println("millis: " + millis()); 
+  
+  
   PImage cast = loadImage("images/Cast.PNG"); 
   PImage idle = loadImage("images/fishing1.PNG"); 
   PImage idle2 = loadImage("images/fishing2.PNG");
   PImage rest = loadImage("images/resting.PNG"); 
+  PImage nibble = loadImage("images/nibble.PNG"); 
   cast.resize(600, 0);
   rest.resize(600, 0);
   idle.resize(600, 0); 
   idle2.resize(600, 0); 
+  nibble.resize(600, 0); 
 
   if (player.cast) {
+    
     // Check if the cast animation has just started
     if (millis() - castStartTime < castDuration) {
       image(cast, player.x, player.y); 
     } else {
       // If more than 1 second has passed, switch to idle animation
-      if (millis() > waterDriftDuration) {
-        driftBool = !driftBool;
-        waterDriftDuration = millis() + 1000;
+      // Nibble can occur randomly now
+      
+       
+      println("bite: " + bite); 
+      if (millis() == bite || ((millis() > bite) && (millis() < bite+1000))) {
+        player.nibble = true; 
+        image(nibble, player.x, player.y); 
       }
-      if (driftBool) {
-        image(idle, player.x, player.y);
-      } else {
-        image(idle2, player.x, player.y);
+      else {
+        player.nibble = false; 
+        if (millis() > waterDriftDuration) {
+          driftBool = !driftBool;
+          waterDriftDuration = millis() + 1000;
+        }
+        if (driftBool) {
+          image(idle, player.x, player.y);
+        } else {
+          image(idle2, player.x, player.y);
+        }
       }
     }
   }
+  
   else {
     image(rest, player.x, player.y); 
   }
@@ -350,5 +372,7 @@ void updatePlayer() {
 
 // Call this function when starting the cast animation
 void startCastAnimation() {
-  castStartTime = millis(); 
+  castStartTime = millis();
+  bite = castStartTime + (int)random(2000, 10000);
+  
 }
