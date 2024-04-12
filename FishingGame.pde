@@ -16,6 +16,8 @@ PImage cloud4;
 PImage cloud5;
 PImage cloud6;
 PImage fishingBackground;
+PImage marketBackground; 
+PImage joe; 
 
 // Class to handle game states
 class Game {
@@ -53,10 +55,13 @@ class Player {
   boolean nibble; 
   int x; 
   int y; 
+  int money; 
   Player() {
     cast = false; 
     x = 0; 
     y = 0; 
+    money = 0; 
+    nibble = false; 
   }
 }
 
@@ -87,6 +92,8 @@ void setup() {
     fishingBackground.resize(600, 0);
     plankButton = loadImage("./images/button.PNG");
     plankButton.resize(300, 0);
+    marketBackground = loadImage("./images/market.PNG"); 
+    joe = loadImage("./images/joe.PNG"); 
     loadClouds();
     loadFish();
     click = new SoundFile(this, "./audio/button_sound.mov");
@@ -101,9 +108,10 @@ void draw() {
   } else if (game.isPrologue) {
     drawPrologue(); 
   } else if (game.isFishing) {
-    drawFishing();
-  } else if (game.isShopping) {
-
+    drawFishing(); 
+    if (game.isShopping) {
+      drawMarket(); 
+    }
   } else if (game.isVictorious) {
 
   }
@@ -375,4 +383,21 @@ void startCastAnimation() {
   castStartTime = millis();
   bite = castStartTime + (int)random(2000, 10000);
   
+}
+
+void keyPressed() {
+  if (key == 'M' || key == 'm') {
+    if (game.isShopping) {
+      game.isShopping = false; 
+    }
+    else {
+      game.isShopping = true; 
+    }
+  }
+}
+
+void drawMarket() {
+  image(marketBackground, 0, 0); 
+  joe.resize(200, 0); 
+  image(joe, 380, 177); 
 }
