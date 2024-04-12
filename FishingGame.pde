@@ -22,7 +22,6 @@ PImage joe;
 PImage miniGameBackground;
 PImage miniGameBall;
 PImage backgroundForDisplay;
->>>>>>> refs/remotes/origin/main
 
 // Class to handle game states
 class Game {
@@ -110,7 +109,6 @@ void setup() {
     miniGameBall.resize(16, 0);
     backgroundForDisplay = loadImage("./images/backgroundForDisplay.png");
     backgroundForDisplay.resize(300, 0);
->>>>>>> refs/remotes/origin/main
     loadClouds();
     loadFish();
     click = new SoundFile(this, "./audio/button_sound.mov");
@@ -131,7 +129,6 @@ void draw() {
     if (game.isShopping) {
       drawMarket(); 
     }
-    drawFishing();
   } else if (game.isMiniGame) {
     drawMiniGame();
     if (player.caught) {
@@ -433,11 +430,16 @@ void startCastAnimation() {
 
 void keyPressed() {
   if (key == 'M' || key == 'm') {
+    println("m pressed");
+    println(game.isShopping); 
     if (game.isShopping) {
       game.isShopping = false; 
     }
     else {
       game.isShopping = true; 
+    }
+  }
+}
 
 int ballX = (int)random(150, 435);
 int ballY = (int)random(150, 435);
@@ -487,11 +489,9 @@ void drawMiniGame() {
     } else if (ballY >= 433) {
       SW = false;
       NW = true;
->>>>>>> refs/remotes/origin/main
     }
-  }
+  } 
 }
-
 
 void drawMarket() {
   image(marketBackground, 0, 0); 
