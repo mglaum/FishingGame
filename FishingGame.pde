@@ -22,6 +22,7 @@ PImage joe;
 PImage miniGameBackground;
 PImage miniGameBall;
 PImage backgroundForDisplay;
+PImage butt; 
 
 // Class to handle game states
 class Game {
