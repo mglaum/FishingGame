@@ -17,7 +17,7 @@ PImage cloud5;
 PImage cloud6;
 PImage fishingBackground;
 
-// Class to handle game statesa
+// Class to handle game states
 class Game {
   int difficulty; // 1 = Normal, 2 = Hard
   boolean isMainMenu1; // game state 1: start or quit
