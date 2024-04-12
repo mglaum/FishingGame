@@ -179,7 +179,7 @@ void drawMainMenu() {
   textFont(titleFont);
   text("Fishing Game", 300, 105);
   textFont(casualFont);
-    if (mouseX > 160 && mouseX < 430 && mouseY > 242 && mouseY < 314) {
+  if (mouseX > 160 && mouseX < 430 && mouseY > 242 && mouseY < 314) {
     fill(255); 
   }
   else {
@@ -284,7 +284,6 @@ void checkBounds() {
 }
 
 void mousePressed() {
-  print("X: " + mouseX + ", Y: " + mouseY);
   // lower button: main menu 1 -> quit, main menu 2 -> hard difficulty
   if (game.isMainMenu1 || game.isMainMenu2) {
     if (mouseX > 160 && mouseX < 430 && mouseY > 370 && mouseY < 430) {
@@ -528,8 +527,10 @@ void displayFish() {
   textSize(10);
   textAlign(CENTER);
   text("You caught a " + currName + "!", 300, 250);
+  if (mouseX >= 219 && mouseY >= 379 && mouseX <= 379 && mouseY <= 419) {
+    fill(255); 
+  }
   textSize(14);
   text("Continue", 300, 405);
   imageMode(CORNER);
-
 }
