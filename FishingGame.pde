@@ -2,6 +2,7 @@ import processing.sound.*;
 SoundFile click;
 // Array of all fish in the game
 Fish[] fish = new Fish[6]; // Update size as fish are added
+ArrayList<Fish> fishInTheSea = new ArrayList<Fish>(); // array for random generation of fish
 Game game = new Game();
 Player player = new Player(); 
 
@@ -18,6 +19,10 @@ PImage cloud6;
 PImage fishingBackground;
 PImage marketBackground; 
 PImage joe; 
+PImage miniGameBackground;
+PImage miniGameBall;
+PImage backgroundForDisplay;
+>>>>>>> refs/remotes/origin/main
 
 // Class to handle game states
 class Game {
@@ -26,13 +31,15 @@ class Game {
   boolean isMainMenu2; // game state 2: select difficulty
   boolean isPrologue; // game state 3: prologue
   boolean isFishing; // game state 4: fishing
-  boolean isShopping; // game state 5: shopping in market
-  boolean isVictorious; // game state 6: end credits
+  boolean isMiniGame; // game state 5: mini game to catch a fish after nibble
+  boolean isShopping; // game state 6: shopping in market
+  boolean isVictorious; // game state 7: end credits
   Game() {
     isMainMenu1 = true;
     isMainMenu2 = false;
     isPrologue = false;
     isFishing = false;
+    isMiniGame = false;
     isShopping = false;
     isVictorious = false;
   }
@@ -53,11 +60,14 @@ class Fish {
 class Player {
   boolean cast; // True if casting or line is in the water; false if resting/reeled in
   boolean nibble; 
+  boolean caught;
   int x; 
   int y; 
   int money; 
+  ArrayList<Fish> inventory = new ArrayList<Fish>(); // dynamic array
   Player() {
     cast = false; 
+    caught = false;
     x = 0; 
     y = 0; 
     money = 0; 
@@ -94,13 +104,22 @@ void setup() {
     plankButton.resize(300, 0);
     marketBackground = loadImage("./images/market.PNG"); 
     joe = loadImage("./images/joe.PNG"); 
+    miniGameBackground = loadImage("./images/miniGameFrame.png"); // pixels: from (150, 150) to (450, 450)
+    miniGameBackground.resize(300, 0);
+    miniGameBall = loadImage("./images/miniGameBall.png");
+    miniGameBall.resize(16, 0);
+    backgroundForDisplay = loadImage("./images/backgroundForDisplay.png");
+    backgroundForDisplay.resize(300, 0);
+>>>>>>> refs/remotes/origin/main
     loadClouds();
     loadFish();
     click = new SoundFile(this, "./audio/button_sound.mov");
     //TODO: remove after testing
-    // game.isFishing = true;
-    // game.isMainMenu1 = false;
+    //  game.isFishing = true;
+    //  game.isMainMenu1 = false;
 }
+
+
 
 void draw() {
   if (game.isMainMenu1 || game.isMainMenu2) {
@@ -111,6 +130,14 @@ void draw() {
     drawFishing(); 
     if (game.isShopping) {
       drawMarket(); 
+    }
+    drawFishing();
+  } else if (game.isMiniGame) {
+    drawMiniGame();
+    if (player.caught) {
+      displayFish();
+    } else {
+
     }
   } else if (game.isVictorious) {
 
@@ -229,6 +256,12 @@ void loadFish() {
   fishImage.resize(64, 0);
   fish[5] = new Fish(3, "Shrimp", fishImage, 10);
 
+  // for each fish in fish array, add r fish (r=rarity count) to fishInTheSea
+  for (int i = 0; i < fish.length; i++) {
+    for (int j = 0; j < fish[i].rarity; j++) {
+      fishInTheSea.add(fish[i]);
+    }
+  }
 }
 
 void checkBounds() {
@@ -254,6 +287,7 @@ void checkBounds() {
 }
 
 void mousePressed() {
+  print("X: " + mouseX + ", Y: " + mouseY);
   // lower button: main menu 1 -> quit, main menu 2 -> hard difficulty
   if (game.isMainMenu1 || game.isMainMenu2) {
     if (mouseX > 160 && mouseX < 430 && mouseY > 370 && mouseY < 430) {
@@ -294,13 +328,33 @@ void mousePressed() {
     }
     else {
       player.cast = false; 
-      // check if nibble 
-      
       // Trigger mini game to catch the fish:
+      game.isMiniGame = true;
+      game.isFishing = false;
 
     }
     updatePlayer(); 
     return;
+  }
+  if (game.isMiniGame) {
+    if (player.caught == true) {
+      // If player selects continue after catching a fish
+      if (mouseX >= 219 && mouseY >= 379 && mouseX <= 379 && mouseY <= 419) {
+        game.isMiniGame = false;
+        player.caught = false; 
+      }
+
+    }
+    if (ballX >= 250 && ballY >= 270 && ballX <= 350 && ballY <= 330) {
+      print("Success");
+      generateFish();
+      player.caught = true;
+      displayFish();
+    } else {
+      print("Failed");
+      game.isMiniGame = false;
+      game.isFishing = true;
+    }
   }
 }
 
@@ -313,9 +367,7 @@ void drawPrologue() {
   background(255); 
   text("Prologue here", width/2, height/2);
   imageMode(CORNER); 
-  //image(plankButton, 400, 10);
   textSize(20); 
-  
   text("skip", width - 50, 50); 
 }
 
@@ -327,11 +379,6 @@ boolean driftBool = true;
 int bite = castStartTime + (int)random(2000, 10000);
 
 void updatePlayer() {
-  println("Cast start time:" + castStartTime); 
-  //println("CastDuration: " + castDuration); 
-  println("millis: " + millis()); 
-  
-  
   PImage cast = loadImage("images/Cast.PNG"); 
   PImage idle = loadImage("images/fishing1.PNG"); 
   PImage idle2 = loadImage("images/fishing2.PNG");
@@ -351,7 +398,6 @@ void updatePlayer() {
     } else {
       // If more than 1 second has passed, switch to idle animation
       // Nibble can occur randomly now
-      
        
       println("bite: " + bite); 
       if (millis() == bite || ((millis() > bite) && (millis() < bite+1000))) {
@@ -392,12 +438,98 @@ void keyPressed() {
     }
     else {
       game.isShopping = true; 
+
+int ballX = (int)random(150, 435);
+int ballY = (int)random(150, 435);
+boolean NE, NW, SW = false; // Directions: Northeast, Northwest, etc.
+boolean SE = true;
+
+void drawMiniGame() {
+  image(miniGameBackground, 150, 150);
+  image(miniGameBall, ballX, ballY);
+
+  if (SE) {
+   ballX++;
+    ballY += 2;
+    if (ballY >= 433) {
+      SE = false;
+      NE = true;
+    } else if (ballX >= 433) {
+      SE = false;
+      SW = true;
+    }
+  } else if (NE) {
+    ballX++;
+    ballY -= 2;
+    if (ballX >= 433) {
+      NE = false;
+      NW = true;
+    } else if (ballY <= 151) { 
+      NE = false;
+      SE = true;
+    }
+  } else if (NW) {
+    ballX--;
+    ballY -= 2;
+    if (ballY <= 151) {
+      NW = false;
+      SW = true;
+    } else if (ballX <= 151) {
+      NW = false;
+      NE = true;
+    }
+  } else if (SW) {
+    ballX--;
+    ballY += 2;
+    if (ballX <= 151) {
+      SW = false;
+      SE = true;
+    } else if (ballY >= 433) {
+      SW = false;
+      NW = true;
+>>>>>>> refs/remotes/origin/main
     }
   }
 }
+
 
 void drawMarket() {
   image(marketBackground, 0, 0); 
   joe.resize(200, 0); 
   image(joe, 380, 177); 
+}
+
+PImage currCatch;
+String currName;
+// Only generate the fish once
+void generateFish() {
+  int fishNum = (int)random(0, fishInTheSea.size());
+  Fish caughtFish = fishInTheSea.get(fishNum);
+  PImage img = caughtFish.sprite;
+  img.resize(128, 128);
+  currCatch = img;
+  currName = caughtFish.name;
+  print("Caught: " + caughtFish.name);
+  player.inventory.add(caughtFish);
+}
+
+// Generate and display random fish, add to the inventory
+void displayFish() {
+  image(backgroundForDisplay, 150, 150);
+
+  imageMode(CENTER);
+  image(currCatch, 300, 300);
+  PImage button = plankButton;
+  button.resize(175, 0);
+  image(plankButton, 300, 400);
+
+  fill(#044d57);
+  textFont(casualFont);
+  textSize(10);
+  textAlign(CENTER);
+  text("You caught a " + currName + "!", 300, 250);
+  textSize(14);
+  text("Continue", 300, 405);
+  imageMode(CORNER);
+
 }
