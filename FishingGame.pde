@@ -50,6 +50,7 @@ class Fish {
   String name; 
   PImage sprite;
   float rarity; 
+  int x, y; 
   Fish(int val, String n, PImage img, float r) {
     value = val; 
     name = n; 
@@ -127,10 +128,11 @@ void draw() {
     drawPrologue(); 
   } else if (game.isFishing) {
     drawFishing(); 
-    if (game.isShopping) {
-      drawMarket(); 
-    }
-  } else if (game.isMiniGame) {
+  }
+  else if (game.isShopping) {
+    drawMarket(); 
+  }
+    else if (game.isMiniGame) {
     drawMiniGame();
     if (player.caught) {
       displayFish();
@@ -353,6 +355,17 @@ void mousePressed() {
       game.isFishing = true;
     }
   }
+  if (game.isShopping) {
+    for (Fish f : player.inventory) {
+      if (mouseX >= f.x && mouseX <= f.x+80 && mouseY >=f.y && mouseY <= f.y+50) {
+        player.money += f.value; 
+        player.inventory.remove(f);
+        break; 
+      }
+    }
+  }
+  print("fishing:" + game.isFishing); 
+  print("shopping:" + game.isShopping); 
 }
 
 void drawFishing() {
@@ -434,9 +447,11 @@ void keyPressed() {
     println(game.isShopping); 
     if (game.isShopping) {
       game.isShopping = false; 
+      game.isFishing = true; 
     }
     else {
       game.isShopping = true; 
+      game.isFishing = false; 
     }
   }
 }
@@ -494,10 +509,33 @@ void drawMiniGame() {
 }
 
 void drawMarket() {
+  image(fishingBackground, 0, 0); 
   image(marketBackground, 0, 0); 
   joe.resize(200, 0); 
   image(joe, 380, 177); 
+  int x = 40; 
+  int y = 400; 
+  for (int i = 0; i < player.inventory.size(); i++) {
+    PImage curr = player.inventory.get(i).sprite; 
+    curr.resize(50, 0); 
+    image(curr, x, y); 
+    player.inventory.get(i).x = x; 
+    player.inventory.get(i).y = y; 
+    if (i % 7 == 0 && i != 0) {
+      x = 40; 
+      y += 50; 
+    }
+    else {
+      x+=80; 
+    }
+  fill(#044d57);
+  textFont(casualFont);
+  textSize(35);
+  textAlign(CENTER);
+  text(player.money, 550, 60);
+  }
 }
+
 
 PImage currCatch;
 String currName;
