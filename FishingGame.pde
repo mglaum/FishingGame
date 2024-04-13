@@ -22,6 +22,8 @@ PImage joe;
 PImage miniGameBackground;
 PImage miniGameBall;
 PImage backgroundForDisplay;
+PImage darkenedBackground;
+PImage nibbleImage;
 PImage butt; 
 
 // Class to handle game states
@@ -111,6 +113,8 @@ void setup() {
     miniGameBall.resize(16, 0);
     backgroundForDisplay = loadImage("./images/backgroundForDisplay.png");
     backgroundForDisplay.resize(300, 0);
+    darkenedBackground = loadImage("./images/darkenedBackground.PNG");
+    nibbleImage = loadImage("./images/nibble.PNG");
     loadClouds();
     loadFish();
     click = new SoundFile(this, "./audio/button_sound.mov");
@@ -462,6 +466,9 @@ boolean NE, NW, SW = false; // Directions: Northeast, Northwest, etc.
 boolean SE = true;
 
 void drawMiniGame() {
+  image(fishingBackground, 0, 0);
+  image(nibbleImage, 0, 0);
+  image(darkenedBackground, 0, 0);
   image(miniGameBackground, 150, 150);
   image(miniGameBall, ballX, ballY);
 
