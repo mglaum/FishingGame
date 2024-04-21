@@ -358,6 +358,13 @@ void mousePressed() {
       if (mouseX >= 219 && mouseY >= 379 && mouseX <= 379 && mouseY <= 419) {
         game.isMiniGame = false;
         player.caught = false; 
+        // Check if player has the legendary whale shark and trigger victory
+        for (Fish f : player.inventory) {
+          if (f.name == "Legendary Whale Shark") {
+            game.isVictorious = true;
+            game.isFishing = false;
+          }
+        }
       }
 
     }
@@ -589,12 +596,6 @@ void generateFish() {
   currName = caughtFish.name;
   print("Caught: " + caughtFish.name);
   player.inventory.add(caughtFish);
-  if (caughtFish.name == "Legendary Whale Shark") {
-    game.isVictorious = true;
-    game.isFishing = false;
-    game.isShopping = false;
-    game.isMiniGame = false;
-  }
 }
 
 // Generate and display random fish, add to the inventory
