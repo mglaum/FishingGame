@@ -392,10 +392,11 @@ void drawFishing() {
 // Handles drawing the prologue game state 
 void drawPrologue() {
   background(255); 
-  text("Prologue here", width/2, height/2);
+  textSize(15);
+  text("You have been enlisted by fisherman, \nOne-Armed Joe, to avenge his right \narm lost to the Beast… the \nLegendary Whale Shark. Seek out \nthe Ultimate Fishing Rod, the only \nrod powerful enough to reel \nin the Beast, from the \nMarket. Sell your other catches \nto the Market and buy \nadditional upgrades to help \nyou along the way.\n Good luck, You!", width/2, 200);
   imageMode(CORNER); 
   textSize(20); 
-  text("skip", width - 50, 50); 
+  text("next", width - 50, 50); 
 }
 
 // Declare variables to keep track of time
