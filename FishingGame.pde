@@ -24,6 +24,8 @@ PImage miniGameBall;
 PImage backgroundForDisplay;
 PImage darkenedBackground;
 PImage nibbleImage;
+PImage ultimateFishingRod;
+PImage whaleShark;
 
 // Class to handle game states
 class Game {
@@ -71,6 +73,7 @@ class Player {
   int y; 
   int money; 
   ArrayList<Fish> inventory = new ArrayList<Fish>(); // dynamic array
+  boolean hasUltimateFishingRod = false;
   // Constructor for Player class
   Player() {
     cast = false; 
@@ -121,11 +124,13 @@ void setup() {
     backgroundForDisplay.resize(300, 0);
     darkenedBackground = loadImage("./images/darkenedBackground.PNG");
     nibbleImage = loadImage("./images/nibble.PNG");
+    ultimateFishingRod = loadImage("./images/ultimateFishingRod.PNG");
+    ultimateFishingRod.resize(64, 0);
     loadClouds();
     loadFish();
     click = new SoundFile(this, "./audio/button_sound.mov");
     //TODO: remove after testing
-    //  game.isFishing = true;
+    // game.isVictorious = true;
     //  game.isMainMenu1 = false;
 }
 
@@ -141,16 +146,13 @@ void draw() {
   }
   else if (game.isShopping) {
     drawMarket(); 
-  }
-    else if (game.isMiniGame) {
+  } else if (game.isMiniGame) {
     drawMiniGame();
     if (player.caught) {
       displayFish();
-    } else {
-
     }
   } else if (game.isVictorious) {
-
+    drawVictory();
   }
 }
 
@@ -378,6 +380,11 @@ void mousePressed() {
         break; 
       }
     }
+    if (mouseX >= 40 && mouseX <= 104 && mouseY >= 60 && mouseY <= 124 && player.money >= 100){ // cost of fishing rod set to 100
+      player.hasUltimateFishingRod = true;
+      player.money -= 100;
+      addWhaleShark();
+    }
   }
   print("fishing:" + game.isFishing); 
   print("shopping:" + game.isShopping); 
@@ -540,6 +547,7 @@ void drawMarket() {
   image(joe, 380, 177); 
   int x = 40; 
   int y = 400; 
+  // Draw all player inventory fish
   for (int i = 0; i < player.inventory.size(); i++) {
     PImage curr = player.inventory.get(i).sprite; 
     curr.resize(50, 0); 
@@ -559,6 +567,13 @@ void drawMarket() {
   textAlign(CENTER);
   text(player.money, 550, 60);
   }
+  textSize(20);
+  text("Buy", 200, 50);
+  // Draw ultimate fishing rod
+  if (player.hasUltimateFishingRod == false) {
+    image(ultimateFishingRod, 40, 60);
+
+  }
 }
 
 
@@ -574,6 +589,12 @@ void generateFish() {
   currName = caughtFish.name;
   print("Caught: " + caughtFish.name);
   player.inventory.add(caughtFish);
+  if (caughtFish.name == "Legendary Whale Shark") {
+    game.isVictorious = true;
+    game.isFishing = false;
+    game.isShopping = false;
+    game.isMiniGame = false;
+  }
 }
 
 // Generate and display random fish, add to the inventory
@@ -590,11 +611,29 @@ void displayFish() {
   textFont(casualFont);
   textSize(10);
   textAlign(CENTER);
-  text("You caught a " + currName + "!", 300, 250);
+  if (currName == "Legendary Whale Shark") {
+    text("You caught a \n" + currName + "!", 300, 210);
+  } else {
+    text("You caught a " + currName + "!", 300, 250);
+  }
   if (mouseX >= 219 && mouseY >= 379 && mouseX <= 379 && mouseY <= 419) {
     fill(255); 
   }
   textSize(14);
   text("Continue", 300, 405);
   imageMode(CORNER);
+}
+
+void addWhaleShark() {
+  whaleShark = loadImage("./images/whaleShark.PNG");
+  whaleShark.resize(64, 0);
+  Fish whale = new Fish(1000, "Legendary Whale Shark", whaleShark, 10);
+  for (int i = 0; i < whale.rarity; i++) {
+      fishInTheSea.add(whale);
+  }
+}
+
+// Handles drawing the victory screen
+void drawVictory() {
+
 }
