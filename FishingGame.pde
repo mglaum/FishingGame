@@ -24,7 +24,6 @@ PImage miniGameBall;
 PImage backgroundForDisplay;
 PImage darkenedBackground;
 PImage nibbleImage;
-PImage butt; 
 
 // Class to handle game states
 class Game {
@@ -36,6 +35,7 @@ class Game {
   boolean isMiniGame; // game state 5: mini game to catch a fish after nibble
   boolean isShopping; // game state 6: shopping in market
   boolean isVictorious; // game state 7: end credits
+  // Constructor for Game class
   Game() {
     isMainMenu1 = true;
     isMainMenu2 = false;
@@ -47,12 +47,14 @@ class Game {
   }
 }
 
+// Class to handle data of a Fish object
 class Fish {
   int value; 
   String name; 
   PImage sprite;
   float rarity; 
   int x, y; 
+  // Constructor for Fish class
   Fish(int val, String n, PImage img, float r) {
     value = val; 
     name = n; 
@@ -60,6 +62,7 @@ class Fish {
     rarity = r; // i.e. Most common: 20, Least common: 1
   }
 }
+// Class to handle data of a Player object
 class Player {
   boolean cast; // True if casting or line is in the water; false if resting/reeled in
   boolean nibble; 
@@ -68,6 +71,7 @@ class Player {
   int y; 
   int money; 
   ArrayList<Fish> inventory = new ArrayList<Fish>(); // dynamic array
+  // Constructor for Player class
   Player() {
     cast = false; 
     caught = false;
@@ -78,16 +82,17 @@ class Player {
   }
 }
 
+// Class to handle data of a FishingRod object
 class FishingRod {
   PImage sprite; 
   String name; 
   Upgrade[] upgrades; 
 }
-
+// Class to handle data of an Upgrade object
 class Upgrade {
   String name; 
 }
-
+// Class to handle data of a Market object
 class Market {
   Upgrade[] upgrades;
   FishingRod[] rods; 
@@ -96,6 +101,7 @@ class Market {
   }
 }
 
+// Handles some initialization and image loading for the game
 void setup() {
     size(600,600);
     titleFont = createFont("./fonts/PIXEL-LI.TTF", 100);
@@ -124,7 +130,7 @@ void setup() {
 }
 
 
-
+// Looping function which draws different screens dependent on the game state
 void draw() {
   if (game.isMainMenu1 || game.isMainMenu2) {
     drawMainMenu(); 
@@ -159,6 +165,7 @@ int fish1 = 100;
 int fish2 = 500;
 int fish3 = 300;
 
+// Handles drawing the main menu
 void drawMainMenu() {
   // drawing images: background, clouds, fish, buttons
   image(mainMenuBackground, 0, 0);
@@ -214,6 +221,7 @@ void drawMainMenu() {
   imageMode(CORNER);
 }
 
+// Handles loading the cloud images used in the main menu
 void loadClouds() {
   cloud1 = loadImage("./images/pixelcloud_1.png");
   cloud1.resize(128, 0);
@@ -229,6 +237,7 @@ void loadClouds() {
   cloud6.resize(60, 0);
 }
 
+// Handles loading the fish images, creating Fish objects for each, and storing them in the fish array
 void loadFish() {
   // Fish 1: Clownfish
   PImage fishImage = loadImage("./images/fish/1.PNG");
@@ -268,6 +277,7 @@ void loadFish() {
   }
 }
 
+// Checks bounds of the sky on the main menu for cloud animations
 void checkBounds() {
   // move clouds/fish to opposite side of the screen once they move out of the window
   if (x1 < -128)
@@ -290,6 +300,7 @@ void checkBounds() {
     fish3 = -64;
 }
 
+// On a mouse button press, handles change in game logic or state dependent on the current game state
 void mousePressed() {
   // lower button: main menu 1 -> quit, main menu 2 -> hard difficulty
   if (game.isMainMenu1 || game.isMainMenu2) {
@@ -372,11 +383,13 @@ void mousePressed() {
   print("shopping:" + game.isShopping); 
 }
 
+// Handles drawing the fishing game state 
 void drawFishing() {
   image(fishingBackground, 0, 0);
   updatePlayer(); 
 }
 
+// Handles drawing the prologue game state 
 void drawPrologue() {
   background(255); 
   text("Prologue here", width/2, height/2);
@@ -392,6 +405,7 @@ int waterDriftDuration;
 boolean driftBool = true;
 int bite = castStartTime + (int)random(2000, 10000);
 
+// Handles the fishing animations: resting, casting, idling (water drifting), and nibble
 void updatePlayer() {
   PImage cast = loadImage("images/Cast.PNG"); 
   PImage idle = loadImage("images/fishing1.PNG"); 
@@ -438,13 +452,14 @@ void updatePlayer() {
   }
 }
 
-// Call this function when starting the cast animation
+// Handles tracking time for use in the casting/fishing animations
 void startCastAnimation() {
   castStartTime = millis();
   bite = castStartTime + (int)random(2000, 10000);
   
 }
 
+// On a key press, "M" or "m", toggles in and out of the Market game state
 void keyPressed() {
   if (key == 'M' || key == 'm') {
     println("m pressed");
@@ -465,6 +480,7 @@ int ballY = (int)random(150, 435);
 boolean NE, NW, SW = false; // Directions: Northeast, Northwest, etc.
 boolean SE = true;
 
+// Implements the animation of the fishing mini game: ball bouncing
 void drawMiniGame() {
   image(fishingBackground, 0, 0);
   image(nibbleImage, 0, 0);
@@ -515,6 +531,7 @@ void drawMiniGame() {
   } 
 }
 
+// Handles drawing of the fishing market: draws player inventory, Joe, player's money, and items for sale
 void drawMarket() {
   image(fishingBackground, 0, 0); 
   image(marketBackground, 0, 0); 
@@ -546,7 +563,7 @@ void drawMarket() {
 
 PImage currCatch;
 String currName;
-// Only generate the fish once
+// Generates a random fish once the player catches it; Only generate the fish once per nibble
 void generateFish() {
   int fishNum = (int)random(0, fishInTheSea.size());
   Fish caughtFish = fishInTheSea.get(fishNum);
