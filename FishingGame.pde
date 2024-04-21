@@ -475,8 +475,8 @@ void keyPressed() {
   }
 }
 
-int ballX = (int)random(150, 435);
-int ballY = (int)random(150, 435);
+int ballX = 210;
+int ballY = 175;
 boolean NE, NW, SW = false; // Directions: Northeast, Northwest, etc.
 boolean SE = true;
 
