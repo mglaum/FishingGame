@@ -1,10 +1,16 @@
 import processing.sound.*;
 SoundFile click;
+SoundFile music; 
+SoundFile rod; 
+SoundFile bubble; 
+SoundFile fishSound; 
+SoundFile coin; 
 // Array of all fish in the game
 Fish[] fish = new Fish[6]; // Update size as fish are added
 ArrayList<Fish> fishInTheSea = new ArrayList<Fish>(); // array for random generation of fish
 Game game = new Game();
 Player player = new Player(); 
+
 
 PFont titleFont;
 PFont casualFont;
@@ -124,11 +130,17 @@ void setup() {
     backgroundForDisplay.resize(300, 0);
     darkenedBackground = loadImage("./images/darkenedBackground.PNG");
     nibbleImage = loadImage("./images/nibble.PNG");
-    ultimateFishingRod = loadImage("./images/ultimateFishingRod.PNG");
-    ultimateFishingRod.resize(64, 0);
+    ultimateFishingRod = loadImage("./images/ultimateFishingRod.png");
+    ultimateFishingRod.resize(250, 0);
     loadClouds();
     loadFish();
     click = new SoundFile(this, "./audio/button_sound.mov");
+    music = new SoundFile(this, "./audio/music.mp3"); 
+    rod = new SoundFile(this, "./audio/rod.mp3"); 
+    bubble = new SoundFile(this, "./audio/bubble.wav"); 
+    coin = new SoundFile(this, "./audio/coin.mp3"); 
+    fishSound = new SoundFile(this, "./audio/fish.mp3"); 
+    music.loop(); 
     //TODO: remove after testing
     // game.isVictorious = true;
     //  game.isMainMenu1 = false;
@@ -137,6 +149,7 @@ void setup() {
 
 // Looping function which draws different screens dependent on the game state
 void draw() {
+  
   if (game.isMainMenu1 || game.isMainMenu2) {
     drawMainMenu(); 
   } else if (game.isPrologue) {
@@ -193,7 +206,7 @@ void drawMainMenu() {
 
   fill(#044d57);
   textFont(titleFont);
-  text("Fishing Game", 300, 105);
+  text("Gone Fishing", 300, 105);
   textFont(casualFont);
   if (mouseX > 160 && mouseX < 430 && mouseY > 242 && mouseY < 314) {
     fill(255); 
@@ -330,8 +343,9 @@ void mousePressed() {
      }
      return;
   }
+  // "Next" button on prologue 
   if (game.isPrologue) {
-    if (mouseX > 510 && mouseX < 587 && mouseY > 32 && mouseY < 52) {
+    if (mouseX > 170 && mouseX < 410 && mouseY > 469 && mouseY < 524) {
       game.isPrologue = false; 
       game.isFishing = true; 
     }
@@ -344,9 +358,12 @@ void mousePressed() {
     }
     else {
       player.cast = false; 
+      if (player.nibble) {
       // Trigger mini game to catch the fish:
       game.isMiniGame = true;
+      rod.play(); 
       game.isFishing = false;
+      }
 
     }
     updatePlayer(); 
@@ -363,6 +380,7 @@ void mousePressed() {
           if (f.name == "Legendary Whale Shark") {
             game.isVictorious = true;
             game.isFishing = false;
+            break; 
           }
         }
       }
@@ -372,29 +390,41 @@ void mousePressed() {
       print("Success");
       generateFish();
       player.caught = true;
+      fishSound.play(); 
       displayFish();
     } else {
       print("Failed");
       game.isMiniGame = false;
-      game.isFishing = true;
+      if (!game.isVictorious) {
+         game.isFishing = true;
+      }
     }
   }
   if (game.isShopping) {
+    // Selling a fish
     for (Fish f : player.inventory) {
       if (mouseX >= f.x && mouseX <= f.x+80 && mouseY >=f.y && mouseY <= f.y+50) {
         player.money += f.value; 
         player.inventory.remove(f);
+        coin.play(); 
         break; 
       }
     }
-    if (mouseX >= 40 && mouseX <= 104 && mouseY >= 60 && mouseY <= 124 && player.money >= 100){ // cost of fishing rod set to 100
-      player.hasUltimateFishingRod = true;
-      player.money -= 100;
-      addWhaleShark();
+    if (mouseX >= 90 && mouseX <= 242 && mouseY >= 75 && mouseY <= 265){ // cost of fishing rod set to 100 for normal mode, 500 for hard 
+    if (player.money >= 100 && game.difficulty == 1) {
+        player.hasUltimateFishingRod = true;
+        player.money -= 100;
+        coin.play(); 
+        addWhaleShark();
+     }
+     else if (player.money >= 500 && game.difficulty == 2) {
+        player.hasUltimateFishingRod = true;
+        player.money -= 500;
+        coin.play(); 
+        addWhaleShark();
+     }
     }
   }
-  print("fishing:" + game.isFishing); 
-  print("shopping:" + game.isShopping); 
 }
 
 // Handles drawing the fishing game state 
@@ -405,12 +435,25 @@ void drawFishing() {
 
 // Handles drawing the prologue game state 
 void drawPrologue() {
-  background(255); 
+  background(#044d57); 
+  println("x: " + mouseX); // 170 410
+  println("y: " + mouseY); //469 524
+
+  image(fish[0].sprite, fish1++, 300);
+  image(fish[1].sprite, fish2++, 100);
+  image(fish[2].sprite, fish3++, 500);
+  
+  
+  checkBounds();
   textSize(15);
-  text("You have been enlisted by fisherman, \nOne-Armed Joe, to avenge his right \narm lost to the Beast… the \nLegendary Whale Shark. Seek out \nthe Ultimate Fishing Rod, the only \nrod powerful enough to reel \nin the Beast, from the \nMarket. Sell your other catches \nto the Market and buy \nadditional upgrades to help \nyou along the way.\n Good luck, You!", width/2, 200);
+  fill(255); 
+  text("You have been enlisted by fisherman, \nOne-Armed Joe, to avenge his right \narm lost to the Beast… the \nLegendary Whale Shark. Seek out \nthe Ultimate Fishing Rod, the only \nrod powerful enough to reel \nin the Beast, from the \nMarket. Sell your other catches \nto the Market to save \nup for the rod. \n Good luck, You!", width/2, 200);
   imageMode(CORNER); 
   textSize(20); 
-  text("next", width - 50, 50); 
+    imageMode(CENTER);
+  image(plankButton, 300, 500);
+  text("Next", 300, 510);
+  imageMode(CORNER); 
 }
 
 // Declare variables to keep track of time
@@ -444,6 +487,7 @@ void updatePlayer() {
        
       println("bite: " + bite); 
       if (millis() == bite || ((millis() > bite) && (millis() < bite+1000))) {
+        bubble.play(); 
         player.nibble = true; 
         image(nibble, player.x, player.y); 
       }
@@ -561,26 +605,83 @@ void drawMarket() {
     image(curr, x, y); 
     player.inventory.get(i).x = x; 
     player.inventory.get(i).y = y; 
-    if (i % 7 == 0 && i != 0) {
+    if (i % 7 == 0 && i != 0) { //new row 
       x = 40; 
       y += 50; 
     }
     else {
       x+=80; 
     }
+  }
   fill(#044d57);
   textFont(casualFont);
   textSize(35);
   textAlign(CENTER);
   text(player.money, 550, 60);
-  }
-  textSize(20);
-  text("Buy", 200, 50);
+  textSize(12);
+  text("Ultimate Fishing Rod", 200, 50);
   // Draw ultimate fishing rod
   if (player.hasUltimateFishingRod == false) {
-    image(ultimateFishingRod, 40, 60);
-
+    image(ultimateFishingRod, 40, 40);
+    textSize(20); 
+    if (game.difficulty == 1) {
+      text("Cost: 100", 200, 330);
+    }
+    else {
+      text("Cost: 500", 200, 330);
+    }
   }
+  else {
+    textSize(20); 
+    text("Purchased!", 200, 250); 
+  }
+  // Hover over the fish in the market to see their prices  
+  for (Fish f : player.inventory) {
+      if (mouseX >= f.x && mouseX <= f.x+80 && mouseY >=f.y && mouseY <= f.y+50) {
+        rectMode(CORNER); 
+        rect(mouseX, mouseY, 95, 40); 
+        textSize(10); 
+        textAlign(CORNER); 
+        fill(255); 
+        text(f.name, mouseX+3, mouseY+20);
+        text("Value: " + f.value, mouseX+3, mouseY+35);
+        // reset
+        fill(#044d57);
+        textSize(35);
+        textAlign(CENTER);
+      }
+  }
+      if (mouseX >= 90 && mouseX <= 242 && mouseY >= 75 && mouseY <= 265 && !player.hasUltimateFishingRod){ // cost of fishing rod set to 100
+      if (player.money >= 100 && game.difficulty == 1) {
+        rectMode(CORNER); 
+        rect(mouseX, mouseY, 95, 40); 
+        textSize(10); 
+        textAlign(CORNER); 
+        fill(255); 
+        text("Click to \nbuy!", mouseX+3, mouseY+20);
+      }
+        else if (player.money >= 500 && game.difficulty == 2) {
+        rectMode(CORNER); 
+        rect(mouseX, mouseY, 95, 40); 
+        textSize(10); 
+        textAlign(CORNER); 
+        fill(255); 
+        text("Click to \nbuy!", mouseX+3, mouseY+20);
+      }
+      else {
+        rectMode(CORNER); 
+        rect(mouseX, mouseY, 100, 40); 
+        textSize(10); 
+        textAlign(CORNER); 
+        fill(255); 
+        text("Not enough \nmoney!", mouseX+3, mouseY+20);
+    }
+    fill(#044d57);
+        textSize(35);
+        textAlign(CENTER);
+        
+        
+}
 }
 
 
@@ -613,6 +714,10 @@ void displayFish() {
   textSize(10);
   textAlign(CENTER);
   if (currName == "Legendary Whale Shark") {
+    //game.isFishing = false;
+    //game.isVictorious = true; 
+    //game.isMiniGame = false; 
+    //drawVictory(); 
     text("You caught a \n" + currName + "!", 300, 210);
   } else {
     text("You caught a " + currName + "!", 300, 250);
@@ -636,5 +741,29 @@ void addWhaleShark() {
 
 // Handles drawing the victory screen
 void drawVictory() {
-
+  imageMode(CORNER); 
+  image(mainMenuBackground, 0, 0);
+  image(cloud1, x1--, 75);
+  image(cloud2, x2--, 10);
+  image(cloud3, x3--, 85);
+  image(cloud4, x4--, 15);
+  image(cloud5, x5--, 25);
+  image(cloud6, x6--, 95);
+  
+  image(fish[0].sprite, fish1++, 500);
+  image(fish[1].sprite, fish2++, 180);
+  image(fish[2].sprite, fish3++, 300);
+  
+  
+  checkBounds();
+  
+  
+  fill(255);
+  imageMode(CENTER); 
+  textAlign(CENTER); 
+  textFont(casualFont); 
+  textSize(25);
+  text("You caught the beast!", width/2, 250); 
+  whaleShark.resize(300, 0); 
+  image(whaleShark, width/2, 400);   
 }
